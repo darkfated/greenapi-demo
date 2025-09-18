@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>GREEN-API Demo</title>
+        <style>
+            body {
+                font-family:
+                    Inter,
+                    system-ui,
+                    Segoe UI,
+                    Roboto,
+                    Arial;
+                background: #f4f6f8;
+                color: #111;
+                padding: 18px;
+            }
+            .wrap {
+                display: flex;
+                gap: 16px;
+                max-width: 1100px;
+                margin: 10px auto;
+            }
+            .left {
+                width: 380px;
+                background: #fff;
+                border: 1px solid #ddd;
+                padding: 14px;
+                border-radius: 8px;
+            }
+            .right {
+                flex: 1;
+                background: #fff;
+                border: 1px solid #ddd;
+                padding: 14px;
+                border-radius: 8px;
+            }
+            label {
+                display: block;
+                font-size: 13px;
+                color: #333;
+                margin-top: 8px;
+            }
+            input,
+            textarea,
+            button {
+                width: 100%;
+                padding: 8px;
+                margin-top: 6px;
+                border-radius: 6px;
+                border: 1px solid #ccc;
+                box-sizing: border-box;
+            }
+            .actions {
+                display: flex;
+                gap: 8px;
+                margin-top: 12px;
+                flex-wrap: wrap;
+            }
+            button {
+                cursor: pointer;
+            }
+            textarea#output {
+                height: 420px;
+                resize: vertical;
+                background: #fafafa;
+            }
+            .small {
+                font-size: 12px;
+                color: #666;
+            }
+        </style>
+    </head>
+    <body>
+        <h2>GREEN-API Demo</h2>
+        <div class="wrap">
+            <div class="left">
+                <label
+                    >idInstance
+                    <input id="idInstance" placeholder="7777..." />
+                </label>
+                <label
+                    >ApiTokenInstance
+                    <input id="apiToken" placeholder="токен..." />
+                </label>
+
+                <div class="actions">
+                    <button id="btnGetSettings">getSettings</button>
+                    <button id="btnGetState">getStateInstance</button>
+                </div>
+
+                <hr />
+
+                <label
+                    >chatId (номер + @c.us)
+                    <input id="chatId" placeholder="77771234567@c.us" />
+                </label>
+                <label
+                    >message
+                    <input id="message" placeholder="Hello world!" />
+                </label>
+                <div class="actions">
+                    <button id="btnSendMessage">sendMessage</button>
+                </div>
+
+                <hr />
+
+                <label
+                    >chatId (file)
+                    <input id="chatIdFile" placeholder="77771234567@c.us" />
+                </label>
+                <label
+                    >file URL
+                    <input
+                        id="fileUrl"
+                        placeholder="https://example.com/img.png"
+                    />
+                </label>
+                <label
+                    >fileName
+                    <input id="fileName" placeholder="image.png" />
+                </label>
+                <label
+                    >caption
+                    <input id="caption" placeholder="Описание" />
+                </label>
+                <div class="actions">
+                    <button id="btnSendFile">sendFileByUrl</button>
+                </div>
+
+                <p class="small">
+                    Сначала создаёшь инстанс в GREEN-API и сканируешь QR. После
+                    — вставляешь id и токен сюда.
+                </p>
+            </div>
+
+            <div class="right">
+                <h3>Ответ:</h3>
+                <textarea
+                    id="output"
+                    readonly
+                    placeholder="Здесь будет ответ API..."
+                ></textarea>
+            </div>
+        </div>
+
+        <script>
+            const out = (id) => document.getElementById(id);
+            const show = (txt) =>
+                (out("output").value =
+                    typeof txt === "string"
+                        ? txt
+                        : JSON.stringify(txt, null, 2));
+
+            async function callApi(path, bodyObj = {}) {
+                try {
+                    const res = await fetch("/api/" + path, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(bodyObj),
+                    });
+                    const text = await res.text();
+                    let parsed;
+                    try {
+                        parsed = JSON.parse(text);
+                    } catch (e) {
+                        parsed = text;
+                    }
+                    return { status: res.status, body: parsed };
+                } catch (e) {
+                    return { error: e.toString() };
+                }
+            }
+
+            document.getElementById("btnGetSettings").onclick = async () => {
+                const id = document.getElementById("idInstance").value.trim();
+                const token = document.getElementById("apiToken").value.trim();
+                if (!id || !token) {
+                    alert("Заполни idInstance и ApiTokenInstance");
+                    return;
+                }
+                show({ info: "Запрос getSettings..." });
+                const r = await callApi("getSettings", {
+                    idInstance: id,
+                    apiToken: token,
+                });
+                show(r);
+            };
+
+            document.getElementById("btnGetState").onclick = async () => {
+                const id = document.getElementById("idInstance").value.trim();
+                const token = document.getElementById("apiToken").value.trim();
+                if (!id || !token) {
+                    alert("Заполни idInstance и ApiTokenInstance");
+                    return;
+                }
+                show({ info: "Запрос getStateInstance..." });
+                const r = await callApi("getStateInstance", {
+                    idInstance: id,
+                    apiToken: token,
+                });
+                show(r);
+            };
+
+            document.getElementById("btnSendMessage").onclick = async () => {
+                const id = document.getElementById("idInstance").value.trim();
+                const token = document.getElementById("apiToken").value.trim();
+                const chatId = document.getElementById("chatId").value.trim();
+                const message = document.getElementById("message").value;
+                if (!id || !token || !chatId || !message) {
+                    alert("Заполни id, token, chatId и message");
+                    return;
+                }
+                show({ info: "Отправка sendMessage..." });
+                const r = await callApi("sendMessage", {
+                    idInstance: id,
+                    apiToken: token,
+                    chatId,
+                    message,
+                });
+                show(r);
+            };
+
+            document.getElementById("btnSendFile").onclick = async () => {
+                const id = document.getElementById("idInstance").value.trim();
+                const token = document.getElementById("apiToken").value.trim();
+                const chatId = document
+                    .getElementById("chatIdFile")
+                    .value.trim();
+                const urlFile = document.getElementById("fileUrl").value.trim();
+                const fileName = document
+                    .getElementById("fileName")
+                    .value.trim();
+                const caption = document.getElementById("caption").value;
+                if (!id || !token || !chatId || !urlFile || !fileName) {
+                    alert("Заполни id, token, chatId, urlFile и fileName");
+                    return;
+                }
+                show({ info: "Отправка sendFileByUrl..." });
+                const r = await callApi("sendFileByUrl", {
+                    idInstance: id,
+                    apiToken: token,
+                    chatId,
+                    urlFile,
+                    fileName,
+                    caption,
+                });
+                show(r);
+            };
+        </script>
+    </body>
+</html>
