@@ -1,6 +1,9 @@
 # GreenAPI Demo
 HTML-страница для взаимодействия с GreenAPI
 
+## Скриншот сайта
+<img width="1903" height="943" alt="image" src="https://github.com/user-attachments/assets/16c477aa-cd9c-468a-b242-adcf9062737b" />
+
 ## Как пользоваться
 1. Создать инстанс в [личном кабинете GREEN-API](https://console.green-api.com/).
 2. Сканировать QR-код в приложении WhatsApp для подключения своего номера.
