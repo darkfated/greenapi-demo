@@ -19,11 +19,11 @@ HTML-страница для взаимодействия с GreenAPI
 ## Инициализация
 1. Перейти в репозиторий
 ```bash
-    git clone https://github.com/darkfated/greenapi-demo
-    cd greenapi-demo
+git clone https://github.com/darkfated/greenapi-demo
+cd greenapi-demo
 ```
 2. Запустить программу
 ```bash
-    go run main.go
+go run main.go
 ```
 3. Перейти на `http://127.0.0.1:8080/`
